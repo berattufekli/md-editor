@@ -1,36 +1,197 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MD Editor - Professional Markdown Editor
 
-## Getting Started
+A powerful and elegant markdown editor built with modern web technologies.
 
-First, run the development server:
+![MD Editor](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)
+![React](https://img.shields.io/badge/React-18-blue?style=flat-square&logo=react)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat-square&logo=typescript)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-4-cyan?style=flat-square&logo=tailwind-css)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+![MD Editor Screenshot](public/screenshot.png)
+
+## 🚀 Features
+
+### Core Editor
+- **Live Markdown Editing** - Write and preview in real-time
+- **Keyboard Shortcuts** - Ctrl+B (Bold), Ctrl+I (Italic), Ctrl+K (Link)
+- **Syntax Highlighting** - Beautiful code block highlighting
+- **Auto-Save** - Never lose your work (configurable interval)
+
+### Formatting Toolbar
+- Bold, Italic, Strikethrough
+- Headings (H1, H2, H3)
+- Quotes, Bullet Lists, Numbered Lists, Task Lists
+- Inline Code, Code Blocks
+- Links, Images, Tables
+- Horizontal Rules
+
+### Document Management
+- **Sidebar** - View and manage all documents
+- **Search** - Quick document search
+- **Rename** - Rename documents via context menu
+- **Delete** - Delete documents via context menu (last document protected)
+- **Import** - Load .md files from your computer
+- **Export** - Download documents as .md files
+
+### Preview Modes
+- **Right Panel** - Side-by-side editing and preview
+- **Bottom Panel** - Stacked layout
+- **Split View** - Equal split
+- **Toggle Preview** - Show/hide preview
+
+### Appearance
+- **Theme Support** - Light, Dark, and System modes
+- **Font Family Selector** - Choose from 4 modern fonts:
+  - Inter - Clean, professional sans-serif
+  - Plus Jakarta Sans - Modern, elegant
+  - Fira Code - Monospace with ligatures
+  - JetBrains Mono - Developer-focused monospace
+- **Customizable Font Size** - 12px to 24px
+- **Adjustable Line Height** - Comfortable reading
+- **Word Wrap** - Long lines wrap automatically
+- **Spell Check** - Built-in browser spell check
+
+## 🛠️ Tech Stack
+
+| Technology | Version | Purpose |
+|------------|---------|---------|
+| **Next.js** | 16.2.7 | React framework with App Router |
+| **React** | 19 | UI library |
+| **TypeScript** | 5 | Type safety |
+| **Tailwind CSS** | v4 | Utility-first styling |
+| **shadcn/ui** | v4 | UI component library (base-ui) |
+| **Lucide React** | latest | Icon system |
+| **react-markdown** | 9.x | Markdown rendering |
+| **remark-gfm** | 4.x | GitHub Flavored Markdown |
+| **rehype-highlight** | 7.x | Syntax highlighting |
+| **rehype-raw** | 7.x | Raw HTML in markdown |
+
+## 📁 Project Structure
+
+```
+md-editor/
+├── src/
+│   ├── app/
+│   │   ├── page.tsx          # Main editor page
+│   │   ├── layout.tsx        # Root layout with providers
+│   │   └── globals.css       # Global styles & markdown prose
+│   ├── components/
+│   │   ├── editor/
+│   │   │   ├── markdown-editor.tsx     # Editor textarea
+│   │   │   ├── markdown-toolbar.tsx   # Formatting toolbar
+│   │   │   ├── markdown-preview.tsx   # Live preview
+│   │   │   ├── editor-sidebar.tsx     # Document list
+│   │   │   └── settings-dialog.tsx    # Settings panel
+│   │   ├── providers/
+│   │   │   └── theme-provider.tsx    # Theme context
+│   │   └── ui/               # shadcn/ui components
+│   ├── hooks/
+│   │   ├── use-local-storage.ts       # Persistent state
+│   │   └── use-mobile.ts             # Mobile detection
+│   ├── lib/
+│   │   └── utils.ts                  # Utility functions
+│   └── types/
+│       └── editor.ts                  # TypeScript types
+├── public/
+├── package.json
+├── tailwind.config.ts
+├── tsconfig.json
+├── components.json
+└── README.md
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🚦 Getting Started
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Prerequisites
+- Node.js 18+
+- npm or yarn
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Installation
 
-## Learn More
+```bash
+# Clone or navigate to project
+cd ~/Desktop/bbStudio/md-editor
 
-To learn more about Next.js, take a look at the following resources:
+# Install dependencies
+npm install
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Start development server
+npm run dev
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Build for production
+npm run build
 
-## Deploy on Vercel
+# Run linter
+npm run lint
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Development
+```bash
+npm run dev
+```
+Open [http://localhost:3000](http://localhost:3000) to start editing.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## ⌨️ Keyboard Shortcuts
+
+| Shortcut | Action |
+|----------|--------|
+| `Ctrl + B` | Bold |
+| `Ctrl + I` | Italic |
+| `Ctrl + K` | Insert Link |
+| `Tab` | Indent |
+| `Shift + Tab` | Dedent |
+
+## 📝 Markdown Support
+
+### Standard Markdown
+- Headings (#, ##, ###)
+- Bold (**text**)
+- Italic (*text*)
+- Strikethrough (~~text~~)
+- Links ([text](url))
+- Images (![alt](url))
+- Code (`code`)
+- Blockquotes (>)
+- Lists (-, 1.)
+- Horizontal rules (---)
+
+### GitHub Flavored Markdown
+- Task lists (- [ ] / - [x])
+- Tables
+- Fenced code blocks (```)
+- Autolinks
+
+### Additional
+- Syntax highlighting in code blocks
+- Raw HTML support
+
+## 💾 Data Storage
+
+All documents and settings are stored in browser's **localStorage**:
+- `md-editor-documents` - Your documents
+- `md-editor-settings` - Editor preferences
+- `md-editor-theme` - Theme preference
+
+## 🎨 Theme
+
+The editor supports three theme modes:
+- **Light** - Clean light interface
+- **Dark** - Easy on the eyes
+- **System** - Follows system preference
+
+## 📦 Components
+
+Built with shadcn/ui components:
+- Button, Input, Textarea
+- Dialog, Tooltip, TooltipProvider
+- DropdownMenu, Switch, Slider
+- ScrollArea, Separator, Skeleton
+- Card, Label, Tabs
+
+## 📄 License
+
+MIT License - feel free to use and modify.
+
+---
+
+Built with ❤️ using Next.js, shadcn/ui, and Tailwind CSS
