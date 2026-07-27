@@ -1,6 +1,13 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from 'react';
+import { hydrateSettings } from '@/lib/editor-utils';
 import type { EditorSettings } from '@/types/editor';
 
 const STORAGE_KEY = 'md-editor-settings';
@@ -25,8 +32,7 @@ function readSettings(): EditorSettings {
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return defaultSettings;
-    const parsed = JSON.parse(raw) as Partial<EditorSettings>;
-    return { ...defaultSettings, ...parsed };
+    return hydrateSettings(JSON.parse(raw));
   } catch {
     return defaultSettings;
   }
@@ -67,45 +73,54 @@ interface FontContextValue {
 const FontContext = createContext<FontContextValue | undefined>(undefined);
 
 export function FontProvider({ children }: { children: React.ReactNode }) {
-  const [settings, setSettings] = useState<EditorSettings>(defaultSettings);
-  const [hydrated, setHydrated] = useState(false);
+  const [settings, setSettings] = useState<EditorSettings>(() =>
+    readSettings(),
+  );
 
-  // Hydrate once on the client
+  // Cross-tab sync only — StorageEvent is an external signal, not a
+  // synchronous in-render setState.
   useEffect(() => {
-    setSettings(readSettings());
-    setHydrated(true);
+    if (typeof window === 'undefined') return undefined;
+    const onStorage = (event: StorageEvent) => {
+      if (event.key !== STORAGE_KEY) return;
+      setSettings(readSettings());
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
   }, []);
 
-  // Apply font family — no React state feedback loop.
+  // Apply font family — pure external-system sync (no setState).
   useEffect(() => {
-    if (!hydrated) return;
     const root = document.documentElement;
     const family = FONT_STACKS[settings.fontFamily] ?? FONT_STACKS.inter;
     root.style.setProperty('--editor-font-family', family);
     Object.values(FONT_CLASSES).forEach((cls) => root.classList.remove(cls));
     root.classList.add(FONT_CLASSES[settings.fontFamily] ?? 'font-inter');
-  }, [hydrated, settings.fontFamily]);
+  }, [settings.fontFamily]);
 
-  // Apply editor sizing
+  // Apply editor sizing — pure external-system sync.
   useEffect(() => {
-    if (!hydrated) return;
     const root = document.documentElement;
     root.style.setProperty('--editor-font-size', `${settings.fontSize}px`);
     root.style.setProperty(
       '--editor-line-height',
       String(settings.lineHeight),
     );
-  }, [hydrated, settings.fontSize, settings.lineHeight]);
+  }, [settings.fontSize, settings.lineHeight]);
 
-  // Persist on change after hydration
+  // Persist on change.
   useEffect(() => {
-    if (!hydrated) return;
     writeSettings(settings);
-  }, [hydrated, settings]);
+  }, [settings]);
 
   return (
     <FontContext.Provider
-      value={{ settings, setSettings, hydrated, defaults: defaultSettings }}
+      value={{
+        settings,
+        setSettings,
+        hydrated: true,
+        defaults: defaultSettings,
+      }}
     >
       {children}
     </FontContext.Provider>

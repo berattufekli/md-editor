@@ -1,76 +1,64 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
-function readStorage<T>(key: string, initialValue: T): T {
-  if (typeof window === 'undefined') return initialValue;
+type Updater<T> = T | ((current: T) => T);
+
+function readSnapshot<T>(key: string, fallback: T): T {
+  if (typeof window === 'undefined') return fallback;
   try {
     const raw = window.localStorage.getItem(key);
-    if (raw === null) return initialValue;
-    const parsed = JSON.parse(raw) as unknown;
-    return parsed as T;
-  } catch (error) {
-    console.error(`useLocalStorage: okunamadı "${key}"`, error);
-    return initialValue;
+    if (raw === null) return fallback;
+    return JSON.parse(raw) as T;
+  } catch {
+    return fallback;
   }
 }
 
-function writeStorage<T>(key: string, value: T): void {
+function writeSnapshot<T>(key: string, value: T) {
   if (typeof window === 'undefined') return;
   try {
     window.localStorage.setItem(key, JSON.stringify(value));
-  } catch (error) {
-    console.error(`useLocalStorage: yazılamadı "${key}"`, error);
+  } catch {
+    /* noop */
   }
 }
 
 export function useLocalStorage<T>(
   key: string,
   initialValue: T,
-): [T, (value: T | ((val: T) => T)) => void, boolean] {
-  const [hydrated, setHydrated] = useState(false);
-  const [storedValue, setStoredValue] = useState<T>(initialValue);
-  const isFirstRender = useRef(true);
+): [T, (value: Updater<T>) => void, boolean] {
+  const fallback = useMemo(() => initialValue, [initialValue]);
+  // Lazy initializer already reads from localStorage on the client, so we
+  // do NOT call setState inside an effect to "hydrate" the state.
+  const [storedValue, setStoredValue] = useState<T>(() =>
+    readSnapshot(key, fallback),
+  );
 
-  // Hydrate from localStorage on the client only
+  // Cross-tab updates only — StorageEvent is an external signal, not a
+  // synchronous in-render setState.
   useEffect(() => {
-    setStoredValue(readStorage<T>(key, initialValue));
-    setHydrated(true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key]);
-
-  // Cross-tab sync
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined') return undefined;
     const onStorage = (event: StorageEvent) => {
       if (event.key !== key) return;
-      try {
-        setStoredValue(
-          event.newValue ? (JSON.parse(event.newValue) as T) : initialValue,
-        );
-      } catch {
-        /* noop */
-      }
+      setStoredValue(
+        event.newValue === null ? fallback : readSnapshot<T>(key, fallback),
+      );
     };
     window.addEventListener('storage', onStorage);
     return () => window.removeEventListener('storage', onStorage);
-  }, [key, initialValue]);
+  }, [key, fallback]);
 
   const setValue = useCallback(
-    (value: T | ((val: T) => T)) => {
+    (value: Updater<T>) => {
       setStoredValue((prev) => {
         const next = value instanceof Function ? value(prev) : value;
-        writeStorage(key, next);
+        writeSnapshot(key, next);
         return next;
       });
     },
     [key],
   );
 
-  // Avoid spurious first-render warnings if caller logs
-  useEffect(() => {
-    isFirstRender.current = false;
-  }, []);
-
-  return [storedValue, setValue, hydrated];
+  return [storedValue, setValue, true];
 }

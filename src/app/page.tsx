@@ -9,14 +9,14 @@ import { EditorSidebar } from '@/components/editor/editor-sidebar';
 import { SettingsDrawer } from '@/components/editor/settings-drawer';
 import { MarkdownToolbar } from '@/components/editor/markdown-toolbar';
 import { useLocalStorage } from '@/hooks/use-local-storage';
-import { createDocument, DEFAULT_MARKDOWN, hydrateDocuments, safeFilename, transformSelection, wordStats, type MarkdownAction } from '@/lib/editor-utils';
+import { createDocument, DEFAULT_MARKDOWN, safeFilename, transformSelection, wordStats, type MarkdownAction } from '@/lib/editor-utils';
 import type { Document, EditorSettings } from '@/types/editor';
 
-const defaults: EditorSettings = { fontSize: 16, lineHeight: 1.7, fontFamily: 'inter', wordWrap: true, spellCheck: true, autoSave: true, autoSaveInterval: 30000, showLineNumbers: false, showPreview: true, previewPosition: 'right', theme: 'system' };
+const defaults: EditorSettings = { fontSize: 16, lineHeight: 1.7, fontFamily: 'inter', wordWrap: true, spellCheck: true, autoSave: true, autoSaveInterval: 30000, showLineNumbers: false, showPreview: true, previewPosition: 'right', theme: 'system', mobileView: 'write' };
 const initial = [createDocument('Welcome', DEFAULT_MARKDOWN)];
 
 export default function Home() {
-  const [documents, setDocuments] = useLocalStorage<Document[]>('md-editor-documents', initial, hydrateDocuments);
+  const [documents, setDocuments] = useLocalStorage<Document[]>('md-editor-documents', initial);
   const [settings, setSettings] = useLocalStorage<EditorSettings>('md-editor-settings', defaults);
   const [activeId, setActiveId] = useState(() => documents[0]?.id ?? null);
   const [sidebarOpen, setSidebarOpen] = useState(false);

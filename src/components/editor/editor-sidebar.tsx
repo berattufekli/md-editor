@@ -86,7 +86,7 @@ export function EditorSidebar({
     onDeleteDocument(docId);
   };
 
-  const formatDate = (date: Date) => {
+  const formatDate = (date: Date | string) => {
     return new Date(date).toLocaleDateString('tr-TR', {
       day: 'numeric',
       month: 'short',

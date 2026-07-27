@@ -1,8 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import {
   Tooltip,
   TooltipContent,
@@ -24,7 +22,7 @@ import {
 } from 'lucide-react';
 import { useTheme } from '@/components/providers/theme-provider';
 import { useEditorSettings } from '@/components/providers/font-provider';
-import { formatExactTime, wordStats } from '@/lib/editor-utils';
+import { wordStats } from '@/lib/editor-utils';
 import { cn } from '@/lib/utils';
 import type { Document } from '@/types/editor';
 
@@ -51,8 +49,6 @@ export function AppHeader({
 }: AppHeaderProps) {
   const { theme, setTheme } = useTheme();
   const { settings } = useEditorSettings();
-  const [hydrated, setHydrated] = useState(false);
-  useEffect(() => setHydrated(true), []);
 
   const stats = activeDocument
     ? wordStats(activeDocument.content)
@@ -109,189 +105,41 @@ export function AppHeader({
 
       <Separator orientation="vertical" className="mx-1 hidden h-5 sm:block" />
 
-      {activeDocument && (
-        <div className="hidden min-w-0 flex-1 items-center gap-3 lg:flex">
-          <span className="truncate text-sm text-muted-foreground">
-            {activeDocument.title}
-          </span>
-          {hydrated && (
-            <span
-              className="text-[11px] text-muted-foreground"
-              aria-live="polite"
+      <div className="ml-auto flex items-center gap-1">
+        {activeDocument ? (
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  aria-label="Markdown dosyasını içe aktar"
+                  onClick={onImport}
+                />
+              }
             >
-              {stats.words.toLocaleString('tr-TR')} sözcük ·{' '}
-              {stats.characters.toLocaleString('tr-TR')} karakter ·{' '}
-              {formatExactTime(activeDocument.updatedAt)}
-            </span>
-          )}
-        </div>
-      )}
-
-      <div className="flex flex-1 items-center justify-end gap-1 lg:flex-none">
-        {activeDocument && (
-          <div className="flex items-center gap-1">
-            <Tooltip>
-              <TooltipTrigger
-                render={
-                  <Button
-                    variant="ghost"
-                    size="icon-sm"
-                    aria-label="Markdown dosyasını içe aktar"
-                    onClick={onImport}
-                  />
-                }
-              >
-                <Upload aria-hidden className="size-4" />
-              </TooltipTrigger>
-              <TooltipContent>İçe aktar</TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger
-                render={
-                  <Button
-                    variant="ghost"
-                    size="icon-sm"
-                    aria-label="Markdown dosyası olarak dışa aktar"
-                    onClick={() => onExport(activeDocument)}
-                  />
-                }
-              >
-                <Download aria-hidden className="size-4" />
-              </TooltipTrigger>
-              <TooltipContent>Dışa aktar</TooltipContent>
-            </Tooltip>
-
-            {settings.showPreview ? (
-              <Tooltip>
-                <TooltipTrigger
-                  render={
-                    <Button
-                      variant="ghost"
-                      size="icon-sm"
-                      aria-label="Önizlemeyi gizle"
-                      onClick={onMobilePreviewToggle}
-                      className={cn(
-                        isMobilePreview && 'bg-accent text-foreground',
-                        'md:hidden',
-                      )}
-                    />
-                  }
-                >
-                  <EyeOff aria-hidden className="size-4" />
-                </TooltipTrigger>
-                <TooltipContent>Önizlemeyi gizle</TooltipContent>
-              </Tooltip>
-            ) : (
-              <Tooltip>
-                <TooltipTrigger
-                  render={
-                    <Button
-                      variant="ghost"
-                      size="icon-sm"
-                      aria-label="Önizlemeyi göster"
-                      onClick={onMobilePreviewToggle}
-                      className="md:hidden"
-                    />
-                  }
-                >
-                  <Eye aria-hidden className="size-4" />
-                </TooltipTrigger>
-                <TooltipContent>Önizlemeyi göster</TooltipContent>
-              </Tooltip>
-            )}
-          </div>
-        )}
-
-        <Separator orientation="vertical" className="mx-1 h-5" />
-
-        <div
-          className="hidden items-center gap-0.5 sm:flex"
-          role="group"
-          aria-label="Tema"
-        >
-          <ThemeButton
-            current={theme}
-            target="light"
-            onClick={() => setTheme('light')}
-            label="Açık tema"
-          >
-            <Sun aria-hidden className="size-4" />
-          </ThemeButton>
-          <ThemeButton
-            current={theme}
-            target="dark"
-            onClick={() => setTheme('dark')}
-            label="Koyu tema"
-          >
-            <Moon aria-hidden className="size-4" />
-          </ThemeButton>
-          <ThemeButton
-            current={theme}
-            target="system"
-            onClick={() => setTheme('system')}
-            label="Sistem teması"
-          >
-            <Monitor aria-hidden className="size-4" />
-          </ThemeButton>
-        </div>
-
-        <Separator orientation="vertical" className="mx-1 h-5" />
-
-        <Tooltip>
-          <TooltipTrigger
-            render={
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                aria-label="Ayarları aç"
-                onClick={onOpenSettings}
-              />
-            }
-          >
-            <Settings aria-hidden className="size-4" />
-          </TooltipTrigger>
-          <TooltipContent>Ayarlar</TooltipContent>
-        </Tooltip>
+              <Upload aria-hidden className="size-4" />
+            </TooltipTrigger>
+            <TooltipContent>İçe aktar</TooltipContent>
+          </Tooltip>
+        ) : null}
       </div>
-    </header>
-  );
-}
 
-function ThemeButton({
-  current,
-  target,
-  onClick,
-  label,
-  children,
-}: {
-  current: 'light' | 'dark' | 'system';
-  target: 'light' | 'dark' | 'system';
-  onClick: () => void;
-  label: string;
-  children: React.ReactNode;
-}) {
-  const active = current === target;
-  return (
-    <Tooltip>
-      <TooltipTrigger
-        render={
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            aria-label={label}
-            aria-pressed={active}
-            onClick={onClick}
-            className={cn(
-              active &&
-                'bg-accent text-foreground ring-1 ring-foreground/10',
-            )}
-          />
-        }
-      >
-        {children}
-      </TooltipTrigger>
-      <TooltipContent>{label}</TooltipContent>
-    </Tooltip>
+      <Tooltip>
+        <TooltipTrigger
+          render={
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              aria-label="Ayarları aç"
+              onClick={onOpenSettings}
+            />
+          }
+        >
+          <Settings aria-hidden className="size-4" />
+        </TooltipTrigger>
+        <TooltipContent>Ayarlar</TooltipContent>
+      </Tooltip>
+    </header>
   );
 }

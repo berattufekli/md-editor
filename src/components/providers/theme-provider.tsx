@@ -55,33 +55,40 @@ export function ThemeProvider({
   const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>(
     resolveTheme(defaultTheme),
   );
-  const [hydrated, setHydrated] = useState(false);
 
-  // Hydrate from storage
+  // Cross-tab updates only — StorageEvent is an external signal, not a
+  // synchronous in-render setState.
   useEffect(() => {
-    const stored = getStoredTheme(defaultTheme);
-    setThemeState(stored);
-    setResolvedTheme(resolveTheme(stored));
-    setHydrated(true);
+    if (typeof window === 'undefined') return undefined;
+    const apply = (next: Theme) => {
+      setThemeState(next);
+      setResolvedTheme(resolveTheme(next));
+    };
+    const onStorage = (event: StorageEvent) => {
+      if (event.key !== STORAGE_KEY) return;
+      apply(getStoredTheme(defaultTheme));
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
   }, [defaultTheme]);
 
-  // Apply theme class to <html>
+  // Apply theme class to <html>. This effect reacts to React state, it does
+  // not set any — fully external-system sync.
   useEffect(() => {
-    if (!hydrated) return;
     const root = document.documentElement;
     root.classList.remove('light', 'dark');
     root.classList.add(resolvedTheme);
     root.style.colorScheme = resolvedTheme;
-  }, [hydrated, resolvedTheme]);
+  }, [resolvedTheme]);
 
-  // Track system theme changes when set to "system"
+  // Track system preference changes when set to "system".
   useEffect(() => {
-    if (!hydrated || theme !== 'system') return;
+    if (theme !== 'system') return undefined;
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     const onChange = () => setResolvedTheme(getSystemTheme());
     mediaQuery.addEventListener('change', onChange);
     return () => mediaQuery.removeEventListener('change', onChange);
-  }, [hydrated, theme]);
+  }, [theme]);
 
   const setTheme = useCallback((next: Theme) => {
     try {
@@ -92,6 +99,8 @@ export function ThemeProvider({
     setThemeState(next);
     setResolvedTheme(resolveTheme(next));
   }, []);
+
+  const hydrated = typeof window !== 'undefined';
 
   return (
     <ThemeProviderContext.Provider
@@ -104,8 +113,8 @@ export function ThemeProvider({
 
 export function useTheme() {
   const context = useContext(ThemeProviderContext);
-  if (!context) {
-    throw new Error('useTheme must be used within a ThemeProvider');
+  if (context === undefined) {
+    throw new Error('useTheme must be used within ThemeProvider');
   }
   return context;
 }

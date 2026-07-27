@@ -4,7 +4,8 @@ import { Input as InputPrimitive } from "@base-ui/react/input"
 import { cn } from "@/lib/utils"
 
 function Input({ className, type, ...props }: React.ComponentProps<"input">) {
-  const { suppressHydrationWarning: _suppressHydrationWarning, ...inputProps } = props;
+  // suppressHydrationWarning yalnızca base-ui DOM'una geçirilir; biz yutarız.
+  void (props as { suppressHydrationWarning?: unknown }).suppressHydrationWarning;
   return (
     <InputPrimitive
       type={type}
@@ -14,7 +15,7 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
         "h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
         className
       )}
-      {...inputProps}
+      {...props}
     />
   )
 }

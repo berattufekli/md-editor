@@ -30,6 +30,7 @@ export function MarkdownEditor({
     showPreview: true,
     previewPosition: 'right',
     theme: 'system',
+    mobileView: 'write',
   });
 
   return (

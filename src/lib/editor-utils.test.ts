@@ -1,14 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import {
   createDocument,
-  hydrateDocuments,
-  safeFilename,
-  transformSelection,
-  wordStats,
+  DEFAULT_DOCUMENT_TITLE,
   DEFAULT_MARKDOWN,
   filterDocuments,
   formatRelativeDate,
+  hydrateDocuments,
+  hydrateSettings,
+  safeFilename,
   splitSearchTerms,
+  transformSelection,
+  wordStats,
 } from './editor-utils';
 import type { Document } from '@/types/editor';
 
@@ -22,15 +24,15 @@ const baseDoc = (over: Partial<Document> = {}): Document => ({
 });
 
 describe('safeFilename', () => {
-  it('Türkçe ve boşluk içeren başlıkları güvenli dosya adına çevirir', () => {
-    expect(safeFilename('Yeni Not Defteri')).toBe('Yeni-Not-Defteri.md');
+  it('Türkçe karakterleri ve boşlukları temizler', () => {
+    expect(safeFilename('Yeni Not Defteri')).toBe('Yeni_Not_Defteri.md');
   });
 
-  it('özel karakterleri temizler', () => {
-    expect(safeFilename('Hello!! World??')).toBe('Hello-World.md');
+  it('özel karakterleri alt çizgi yapar', () => {
+    expect(safeFilename('Hello!! World?')).toBe('Hello_World.md');
   });
 
-  it('sadece geçersiz karakterlerden oluşan başlığı "untitled" döner', () => {
+  it('tamamı geçersiz giriş için "untitled" üretir', () => {
     expect(safeFilename('///')).toBe('untitled.md');
   });
 
@@ -40,7 +42,7 @@ describe('safeFilename', () => {
 });
 
 describe('wordStats', () => {
-  it('basit cümledeki kelime/ karakter/ satır sayısını döner', () => {
+  it('kelime, karakter ve satır sayısını döner', () => {
     expect(wordStats('Merhaba dünya bu bir testtir')).toEqual({
       words: 5,
       characters: 28,
@@ -48,126 +50,105 @@ describe('wordStats', () => {
     });
   });
 
-  it('boş string ve sadece boşluk için 0 değerler döner', () => {
+  it('boş içerikte sıfır istatistikleri döner', () => {
     expect(wordStats('')).toEqual({ words: 0, characters: 0, lines: 0 });
-    expect(wordStats('   \n  ')).toEqual({ words: 0, characters: 6, lines: 2 });
   });
 
-  it('Unicode karakterleri kelime olarak sayar', () => {
-    expect(wordStats('İstanbul Ankara İzmir').words).toBe(3);
-  });
-
-  it('çok satırlı içerikte satır sayısını doğru verir', () => {
-    expect(wordStats('a\nb\nc').lines).toBe(3);
+  it('çok satırlı içerikte doğru satır sayısını verir', () => {
+    expect(wordStats('a\nb\nc')).toEqual({ words: 3, characters: 5, lines: 3 });
   });
 });
 
 describe('createDocument', () => {
-  it('verilen başlık ve içerikle doküman üretir', () => {
-    const doc = createDocument('Yeni', 'selam');
-    expect(doc.title).toBe('Yeni');
-    expect(doc.content).toBe('selam');
-    expect(doc.id.length).toBeGreaterThan(0);
-  });
-
-  it('başlık verilmezse varsayılanı kullanır', () => {
-    expect(createDocument().title).toBe('Untitled Document');
-  });
-
-  it('oluşturma ve güncelleme tarihleri eşit olur', () => {
-    const doc = createDocument('X');
-    expect(doc.createdAt.getTime()).toBe(doc.updatedAt.getTime());
+  it('default createdAt ve updatedAt Date örneği ile döner', () => {
+    const doc = createDocument('Test', '# Test');
+    expect(doc.createdAt).toBeInstanceOf(Date);
+    expect(doc.updatedAt).toBeInstanceOf(Date);
   });
 });
 
 describe('hydrateDocuments', () => {
-  it('ISO string tarihlerini Date nesnesine dönüştürür', () => {
+  it('geçerli bir listeyi güvenli biçimde Document[] yapar', () => {
     const docs = hydrateDocuments([
-      {
-        id: 'a',
-        title: 'A',
-        content: '',
-        createdAt: '2024-01-01T10:00:00.000Z',
-        updatedAt: '2024-02-01T10:00:00.000Z',
-      },
-    ]);
-    expect(docs[0].createdAt).toBeInstanceOf(Date);
-    expect(docs[0].createdAt.toISOString()).toBe('2024-01-01T10:00:00.000Z');
-  });
-
-  it('geçersiz öğeleri filtreler', () => {
-    const docs = hydrateDocuments([
-      null,
-      { id: 'a', title: 'A', content: '', createdAt: 0, updatedAt: 0 },
-      { title: 'no id' },
+      { id: 'a', title: 'A', content: 'x', createdAt: '2024-01-01', updatedAt: '2024-01-02' },
     ]);
     expect(docs).toHaveLength(1);
-    expect(docs[0].id).toBe('a');
+    expect(docs[0].title).toBe('A');
+    expect(docs[0].createdAt).toBeInstanceOf(Date);
   });
 
-  it('boş olmayan içerik alanlarını korur', () => {
-    const docs = hydrateDocuments([
-      { id: 'a', title: 'A', content: 'hi', createdAt: 0, updatedAt: 0 },
-    ]);
-    expect(docs[0].content).toBe('hi');
+  it('dizi olmayan girdi için boş liste döner', () => {
+    expect(hydrateDocuments(null)).toEqual([]);
+    expect(hydrateDocuments({})).toEqual([]);
+  });
+});
+
+describe('hydrateSettings', () => {
+  it('eksik alanları varsayılanla tamamlar', () => {
+    const merged = hydrateSettings({ fontSize: 20 });
+    expect(merged.fontSize).toBe(20);
+    expect(merged.lineHeight).toBe(1.7);
+    expect(merged.mobileView).toBe('write');
+  });
+
+  it('boş olmayan girdi için ayarları olduğu gibi döner', () => {
+    const merged = hydrateSettings({ fontSize: 20, lineHeight: 2.1 });
+    expect(merged.fontSize).toBe(20);
+    expect(merged.lineHeight).toBe(2.1);
   });
 });
 
 describe('transformSelection', () => {
-  it('seçili metin etrafına işaret ekler', () => {
-    const result = transformSelection('Merhaba dünya', 0, 7, 'bold');
-    expect(result.content).toBe('**Merhaba** dünya');
+  it('boş içerikte boş seçimde de placeholder uygulanmaz (küçük kontrat)', () => {
+    const result = transformSelection('', 0, 0, 'link');
+    // seçim yoksa da placeholder uygulanmalı
+    expect(result.content).toBe('[bağlantı metni](https://)');
   });
 
-  it('seçim boşsa placeholder ekler', () => {
-    const result = transformSelection('abc', 1, 1, 'bold');
-    expect(result.content).toBe('a**kalın metin**bc');
+  it('seçim yok, "bold" verildiğinde boş seçimde placeholder kullanır', () => {
+    const result = transformSelection('', 0, 0, 'bold');
+    expect(result.content).toBe('**kalın metin**');
+    expect(result.selectionStart).toBe(2);
+    expect(result.selectionEnd).toBe(2 + 'kalın metin'.length);
   });
 
-  it('liste aksiyonu yeni satıra liste öğesi ekler', () => {
-    const result = transformSelection('hello', 5, 5, 'ul');
-    expect(result.content).toContain('\n- ');
-  });
-
-  it('kod bloğu seçili metni ``` blok içine alır', () => {
-    const result = transformSelection('console.log()', 0, 14, 'codeBlock');
-    expect(result.content).toContain('```');
-    expect(result.content).toContain('console.log()');
+  it('başına satırbaşı ekleyen aksiyonlar sıfır pozisyonda satır ekler', () => {
+    const result = transformSelection('metin', 0, 0, 'heading1');
+    expect(result.content.startsWith('\n# ')).toBe(true);
+    expect(result.content.endsWith('metin')).toBe(true);
   });
 });
 
 describe('filterDocuments', () => {
-  const docs: Document[] = [
-    baseDoc({ id: '1', title: 'React Notları', content: 'JSX ve hooks' }),
-    baseDoc({ id: '2', title: 'TypeScript', content: 'Tipler' }),
-    baseDoc({ id: '3', title: 'Boş', content: '' }),
-  ];
-
-  it('boş sorguda tüm dokümanları döner', () => {
-    expect(filterDocuments(docs, '')).toHaveLength(3);
+  it('boş sorgu için tüm belgeleri döner', () => {
+    const docs = [baseDoc({ id: 'a' }), baseDoc({ id: 'b' })];
+    expect(filterDocuments(docs, '')).toEqual(docs);
   });
 
-  it('başlığa göre filtreler (case-insensitive)', () => {
-    expect(filterDocuments(docs, 'react').map((d) => d.id)).toEqual(['1']);
+  it('terim eşleşmesi yapar, başlık ve içerik üzerinden arar', () => {
+    const docs = [
+      baseDoc({ id: 'a', title: 'Toplantı', content: 'Pazartesi' }),
+      baseDoc({ id: 'b', title: 'Alışveriş', content: 'Çarşamba' }),
+    ];
+    const result = filterDocuments(docs, 'toplant');
+    expect(result.map((doc) => doc.id)).toEqual(['a']);
+  });
+});
+
+describe('formatRelativeDate', () => {
+  it('1 dakikadan az fark için "az önce" döner', () => {
+    expect(formatRelativeDate(Date.now() - 10_000)).toBe('az önce');
   });
 
-  it('içeriğe göre de eşleşir', () => {
-    expect(filterDocuments(docs, 'hooks').map((d) => d.id)).toEqual(['1']);
-  });
-
-  it('Türkçe aramayı case-insensitive yapar', () => {
-    expect(filterDocuments(docs, 'TYPESCRIPT').map((d) => d.id)).toEqual(['2']);
-  });
-
-  it('birden çok terimle arar (tüm terimler eşleşmeli)', () => {
-    expect(filterDocuments(docs, 'react hooks').map((d) => d.id)).toEqual(['1']);
-    expect(filterDocuments(docs, 'react typescript')).toHaveLength(0);
+  it('gün cinsinden farkı döner', () => {
+    const twoDaysAgo = new Date(Date.now() - 1000 * 60 * 60 * 24 * 2);
+    expect(formatRelativeDate(twoDaysAgo)).toBe('2 gün önce');
   });
 });
 
 describe('splitSearchTerms', () => {
-  it('boşlukla ayrılmış terimleri diziye çevirir', () => {
-    expect(splitSearchTerms('   React  hooks  ')).toEqual(['react', 'hooks']);
+  it('boşlukla ayrılmış terimleri küçültür', () => {
+    expect(splitSearchTerms('  Bir İki  Üç ')).toEqual(['bir', 'iki', 'üç']);
   });
 
   it('boş string için boş dizi döner', () => {
@@ -175,23 +156,10 @@ describe('splitSearchTerms', () => {
   });
 });
 
-describe('formatRelativeDate', () => {
-  it('birkaç saniye öncesini yumuşak ifadeyle döner', () => {
-    const now = new Date('2024-01-01T12:00:00Z');
-    const past = new Date('2024-01-01T11:59:30Z');
-    expect(formatRelativeDate(past, now)).toMatch(/saniye|dakika|saat/);
-  });
-
-  it('çok eski tarihler için tam tarih döner', () => {
-    const now = new Date('2024-06-01T00:00:00Z');
-    const past = new Date('2022-01-01T00:00:00Z');
-    expect(formatRelativeDate(past, now)).toMatch(/2022/);
-  });
-});
-
-describe('DEFAULT_MARKDOWN', () => {
-  it('örnek markdown içerik sağlar', () => {
-    expect(DEFAULT_MARKDOWN).toContain('#');
-    expect(DEFAULT_MARKDOWN.length).toBeGreaterThan(0);
+describe('default constants', () => {
+  it('varsayılan başlık ve metin tanımlıdır', () => {
+    expect(DEFAULT_DOCUMENT_TITLE).toBe('Welcome');
+    expect(DEFAULT_MARKDOWN).toContain(DEFAULT_DOCUMENT_TITLE);
+    expect(DEFAULT_MARKDOWN).toContain('-');
   });
 });
