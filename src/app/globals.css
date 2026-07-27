@@ -56,213 +56,438 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
+  --radius-sm: calc(var(--radius) * 0.5);
+  --radius-md: calc(var(--radius) * 0.75);
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+  --radius-xl: calc(var(--radius) * 1.25);
+  --radius-2xl: calc(var(--radius) * 1.5);
+  --radius-3xl: calc(var(--radius) * 1.75);
+  --radius-4xl: calc(var(--radius) * 2);
 }
 
+/* ---------------------------------------------------------------------------
+   Modern minimal warm-neutral light + precise near-black dark tokens.
+   Accent: moss/teal (single restrained non-indigo accent).
+   No gradients, no glass, no shadows except hairline borders.
+   --------------------------------------------------------------------------- */
+
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  /* Surfaces — warm parchment light */
+  --background: oklch(0.985 0.004 95);
+  --foreground: oklch(0.22 0.01 80);
+
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: oklch(0.22 0.01 80);
+
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --popover-foreground: oklch(0.22 0.01 80);
+
+  /* Quiet but readable primary — near-black surface */
+  --primary: oklch(0.24 0.008 80);
+  --primary-foreground: oklch(0.985 0.004 95);
+
+  --secondary: oklch(0.965 0.005 95);
+  --secondary-foreground: oklch(0.24 0.008 80);
+
+  --muted: oklch(0.96 0.005 95);
+  --muted-foreground: oklch(0.5 0.012 80);
+
+  --accent: oklch(0.955 0.005 95);
+  --accent-foreground: oklch(0.24 0.008 80);
+
+  --destructive: oklch(0.55 0.18 25);
+  --destructive-foreground: oklch(0.985 0.004 95);
+
+  --border: oklch(0.91 0.006 95);
+  --input: oklch(0.91 0.006 95);
+  --ring: oklch(0.55 0.08 175);
+
+  /* Single moss/teal accent */
+  --accent-brand: oklch(0.55 0.08 175);
+  --accent-brand-foreground: oklch(0.985 0.004 95);
+
+  /* Charts kept neutral — Not used in UI but live in tokens */
+  --chart-1: oklch(0.55 0.08 175);
+  --chart-2: oklch(0.45 0.02 80);
+  --chart-3: oklch(0.35 0.01 80);
+  --chart-4: oklch(0.65 0.04 175);
+  --chart-5: oklch(0.75 0.03 95);
+
+  --radius: 0.5rem;
+
+  --sidebar: oklch(0.99 0.003 95);
+  --sidebar-foreground: oklch(0.22 0.01 80);
+  --sidebar-primary: oklch(0.24 0.008 80);
+  --sidebar-primary-foreground: oklch(0.985 0.004 95);
+  --sidebar-accent: oklch(0.96 0.005 95);
+  --sidebar-accent-foreground: oklch(0.24 0.008 80);
+  --sidebar-border: oklch(0.91 0.006 95);
+  --sidebar-ring: oklch(0.55 0.08 175);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* Precise near-black dark with luminance layers */
+  --background: oklch(0.165 0.005 80);
+  --foreground: oklch(0.94 0.006 95);
+
+  --card: oklch(0.21 0.006 80);
+  --card-foreground: oklch(0.94 0.006 95);
+
+  --popover: oklch(0.21 0.006 80);
+  --popover-foreground: oklch(0.94 0.006 95);
+
+  --primary: oklch(0.94 0.006 95);
+  --primary-foreground: oklch(0.18 0.006 80);
+
+  --secondary: oklch(0.245 0.006 80);
+  --secondary-foreground: oklch(0.94 0.006 95);
+
+  --muted: oklch(0.245 0.006 80);
+  --muted-foreground: oklch(0.66 0.01 95);
+
+  --accent: oklch(0.255 0.007 80);
+  --accent-foreground: oklch(0.94 0.006 95);
+
+  --destructive: oklch(0.65 0.18 25);
+  --destructive-foreground: oklch(0.98 0.006 95);
+
+  --border: oklch(0.31 0.006 80);
+  --input: oklch(0.31 0.006 80);
+  --ring: oklch(0.72 0.08 175);
+
+  --accent-brand: oklch(0.72 0.08 175);
+  --accent-brand-foreground: oklch(0.18 0.006 80);
+
+  --chart-1: oklch(0.72 0.08 175);
+  --chart-2: oklch(0.45 0.02 80);
+  --chart-3: oklch(0.35 0.01 80);
+  --chart-4: oklch(0.65 0.04 175);
+  --chart-5: oklch(0.55 0.03 95);
+
+  --sidebar: oklch(0.19 0.006 80);
+  --sidebar-foreground: oklch(0.94 0.006 95);
+  --sidebar-primary: oklch(0.72 0.08 175);
+  --sidebar-primary-foreground: oklch(0.18 0.006 80);
+  --sidebar-accent: oklch(0.245 0.006 80);
+  --sidebar-accent-foreground: oklch(0.94 0.006 95);
+  --sidebar-border: oklch(0.31 0.006 80);
+  --sidebar-ring: oklch(0.72 0.08 175);
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
-  body {
-    @apply bg-background text-foreground;
-  }
+
   html {
     @apply font-sans;
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "cv11", "ss01", "ss03";
+  }
+
+  /* Focus ring — visible, restrained, consistent */
+  :where(button, a, [role="button"], input, textarea, select, [tabindex]):focus-visible {
+    @apply outline-2 outline-offset-2 outline-ring;
+  }
+
+  /* Hide focus for mouse users on tool triggers */
+  :where(button, [role="button"]):focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 
-/* Markdown Editor Styles */
-.markdown-editor {
-  @apply h-full flex flex-col;
+/* ---------------------------------------------------------------------------
+   Markdown preview prose — editorial, calm, low-noise.
+   --------------------------------------------------------------------------- */
+.markdown-preview {
+  color: var(--foreground);
+  font-size: var(--editor-font-size, 16px);
+  line-height: var(--editor-line-height, 1.7);
+  word-wrap: break-word;
 }
 
-.markdown-editor-content {
-  @apply flex-1 overflow-hidden;
+.markdown-preview > :first-child {
+  margin-top: 0;
 }
 
-.markdown-editor-preview {
-  @apply h-full overflow-auto;
+.markdown-preview h1,
+.markdown-preview h2,
+.markdown-preview h3,
+.markdown-preview h4,
+.markdown-preview h5,
+.markdown-preview h6 {
+  font-family: var(--font-sans);
+  letter-spacing: -0.01em;
+  color: var(--foreground);
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+  font-weight: 600;
+  line-height: 1.25;
 }
 
-/* Prose styles for markdown preview */
-.prose {
-  @apply text-foreground;
+.markdown-preview h1 {
+  font-size: 1.875em;
+  letter-spacing: -0.02em;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.35em;
 }
 
-.prose h1 {
-  @apply text-3xl font-bold mb-4 mt-6 pb-2 border-b;
+.markdown-preview h2 {
+  font-size: 1.5em;
+  letter-spacing: -0.015em;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.3em;
 }
 
-.prose h2 {
-  @apply text-2xl font-semibold mb-3 mt-5 pb-1 border-b;
+.markdown-preview h3 { font-size: 1.25em; }
+.markdown-preview h4 { font-size: 1.0625em; }
+
+.markdown-preview p {
+  margin: 0 0 1em;
 }
 
-.prose h3 {
-  @apply text-xl font-semibold mb-2 mt-4;
+.markdown-preview a {
+  color: var(--accent-brand);
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
 }
 
-.prose h4 {
-  @apply text-lg font-semibold mb-2 mt-3;
+.markdown-preview a:hover {
+  text-decoration-thickness: 2px;
 }
 
-.prose p {
-  @apply mb-4 leading-relaxed;
+.markdown-preview blockquote {
+  border-left: 2px solid var(--border);
+  color: var(--muted-foreground);
+  padding: 0.1em 0 0.1em 1em;
+  margin: 1em 0;
+  font-style: italic;
 }
 
-.prose ul, .prose ol {
-  @apply mb-4 pl-6;
+.markdown-preview ul,
+.markdown-preview ol {
+  padding-left: 1.5em;
+  margin: 0 0 1em;
 }
 
-.prose ul {
-  @apply list-disc;
+.markdown-preview li {
+  margin: 0.35em 0;
 }
 
-.prose ol {
-  @apply list-decimal;
+.markdown-preview li::marker {
+  color: var(--muted-foreground);
 }
 
-.prose li {
-  @apply mb-1;
+.markdown-preview code {
+  font-family: var(--font-mono);
+  background: var(--muted);
+  border: 1px solid var(--border);
+  padding: 0.1em 0.4em;
+  border-radius: 4px;
+  font-size: 0.92em;
 }
 
-.prose blockquote {
-  @apply border-l-4 border-muted-foreground pl-4 italic text-muted-foreground my-4;
+.markdown-preview pre {
+  font-family: var(--font-mono);
+  background: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1em 1.1em;
+  overflow-x: auto;
+  margin: 1em 0;
+  font-size: 0.92em;
+  line-height: 1.55;
 }
 
-.prose code {
-  @apply bg-muted px-1.5 py-0.5 rounded text-sm font-mono;
+.markdown-preview pre code {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
 }
 
-.prose pre {
-  @apply bg-muted rounded-lg p-4 overflow-x-auto my-4;
+.markdown-preview hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 2em 0;
 }
 
-.prose pre code {
-  @apply bg-transparent p-0;
+.markdown-preview table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1em 0;
+  font-size: 0.95em;
 }
 
-.prose a {
-  @apply text-primary underline underline-offset-4 hover:text-primary/80;
+.markdown-preview th,
+.markdown-preview td {
+  border: 1px solid var(--border);
+  padding: 0.55em 0.75em;
+  text-align: left;
 }
 
-.prose img {
-  @apply rounded-lg max-w-full h-auto my-4;
+.markdown-preview th {
+  background: var(--muted);
+  font-weight: 600;
 }
 
-.prose hr {
-  @apply border-t my-6;
+.markdown-preview img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+  border: 1px solid var(--border);
 }
 
-.prose table {
-  @apply w-full border-collapse my-4;
+.markdown-preview input[type="checkbox"] {
+  margin-right: 0.4em;
+  accent-color: var(--accent-brand);
 }
 
-.prose th, .prose td {
-  @apply border border-border px-3 py-2 text-left;
+/* hljs — minimal accent scheme */
+.prose .hljs,
+.markdown-preview .hljs {
+  background: transparent;
+  color: var(--foreground);
 }
 
-.prose th {
-  @apply bg-muted font-semibold;
+.prose .hljs-comment,
+.markdown-preview .hljs-comment {
+  color: var(--muted-foreground);
+  font-style: italic;
 }
 
-.prose input[type="checkbox"] {
-  @apply mr-2;
+.prose .hljs-keyword,
+.markdown-preview .hljs-keyword,
+.prose .hljs-built_in,
+.markdown-preview .hljs-built_in,
+.prose .hljs-tag,
+.markdown-preview .hljs-tag {
+  color: var(--accent-brand);
 }
 
-/* Syntax highlighting */
-.hljs {
-  @apply bg-transparent;
+.prose .hljs-string,
+.markdown-preview .hljs-string,
+.prose .hljs-attr,
+.markdown-preview .hljs-attr {
+  color: oklch(0.55 0.12 150);
 }
 
-/* Editor textarea focus styles */
+.prose .hljs-number,
+.markdown-preview .hljs-number,
+.prose .hljs-literal,
+.markdown-preview .hljs-literal {
+  color: oklch(0.55 0.15 50);
+}
+
+.prose .hljs-title,
+.markdown-preview .hljs-title,
+.prose .hljs-name,
+.markdown-preview .hljs-name {
+  color: oklch(0.45 0.13 280);
+}
+
+.dark .prose .hljs-string,
+.dark .markdown-preview .hljs-string,
+.dark .prose .hljs-attr,
+.dark .markdown-preview .hljs-attr {
+  color: oklch(0.78 0.1 150);
+}
+
+.dark .prose .hljs-number,
+.dark .markdown-preview .hljs-number,
+.dark .prose .hljs-literal,
+.dark .markdown-preview .hljs-literal {
+  color: oklch(0.78 0.13 50);
+}
+
+.dark .prose .hljs-title,
+.dark .markdown-preview .hljs-title,
+.dark .prose .hljs-name,
+.dark .markdown-preview .hljs-name {
+  color: oklch(0.78 0.1 280);
+}
+
+/* ---------------------------------------------------------------------------
+   Editor textarea — paper feel, generous reading line.
+   --------------------------------------------------------------------------- */
+.markdown-textarea {
+  background: var(--background);
+  color: var(--foreground);
+  caret-color: var(--accent-brand);
+  resize: none;
+  outline: none;
+  border: 0;
+  font-family: var(--font-mono);
+  width: 100%;
+  height: 100%;
+  padding: 1.25rem 1.5rem;
+  font-size: var(--editor-font-size, 16px);
+  line-height: var(--editor-line-height, 1.7);
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  tab-size: 2;
+}
+
+.markdown-textarea::placeholder {
+  color: var(--muted-foreground);
+  opacity: 0.7;
+}
+
 .markdown-textarea:focus {
-  @apply outline-none ring-0;
+  outline: none;
 }
 
-/* Scrollbar styles */
+/* ---------------------------------------------------------------------------
+   Scrollbar — thin, warm, never aggressive.
+   --------------------------------------------------------------------------- */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
 .scrollbar-thin::-webkit-scrollbar {
-  @apply w-2 h-2;
+  width: 8px;
+  height: 8px;
 }
 
 .scrollbar-thin::-webkit-scrollbar-track {
-  @apply bg-transparent;
+  background: transparent;
 }
 
 .scrollbar-thin::-webkit-scrollbar-thumb {
-  @apply bg-border rounded-full hover:bg-muted-foreground/30;
+  background: var(--border);
+  border-radius: 999px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-foreground);
+}
+
+/* Document list keyboard focus */
+.doc-item:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: -2px;
+}
+
+/* Empty state */
+.empty-state {
+  color: var(--muted-foreground);
 }

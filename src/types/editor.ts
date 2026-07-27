@@ -2,8 +2,8 @@ export interface Document {
   id: string;
   title: string;
   content: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: Date | string;
+  updatedAt: Date | string;
 }
 
 export interface EditorSettings {
@@ -18,6 +18,7 @@ export interface EditorSettings {
   showPreview: boolean;
   previewPosition: 'right' | 'bottom' | 'split';
   theme: 'light' | 'dark' | 'system';
+  mobileView: 'write' | 'preview';
 }
 
 export interface ToolbarButton {
@@ -25,5 +26,20 @@ export interface ToolbarButton {
   icon: string;
   label: string;
   shortcut?: string;
-  action: 'bold' | 'italic' | 'strikethrough' | 'code' | 'link' | 'image' | 'heading1' | 'heading2' | 'heading3' | 'quote' | 'ul' | 'ol' | 'task' | 'hr' | 'table';
+  action:
+    | 'bold'
+    | 'italic'
+    | 'strikethrough'
+    | 'code'
+    | 'link'
+    | 'image'
+    | 'heading1'
+    | 'heading2'
+    | 'heading3'
+    | 'quote'
+    | 'ul'
+    | 'ol'
+    | 'task'
+    | 'hr'
+    | 'table';
 }

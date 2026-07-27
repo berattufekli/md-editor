@@ -37,6 +37,7 @@ export function MarkdownEditor({
       value={content}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
+      suppressHydrationWarning
       spellCheck={settings.spellCheck}
       className={cn(
         'markdown-textarea min-h-full w-full resize-none border-0 bg-transparent p-4 font-mono text-base outline-none focus-visible:ring-0 focus-visible:ring-offset-0',

@@ -54,17 +54,15 @@ interface ToolbarButtonProps {
 function ToolbarButton({ icon, label, shortcut, onClick, disabled }: ToolbarButtonProps) {
   return (
     <Tooltip>
-      <TooltipTrigger >
-        <Button
+      <TooltipTrigger render={<Button
           variant="ghost"
           size="sm"
           onClick={onClick}
           disabled={disabled}
           className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
-        >
+        />}>
           {icon}
           <span className="sr-only">{label}</span>
-        </Button>
       </TooltipTrigger>
       <TooltipContent side="bottom" className="flex items-center gap-2">
         <span>{label}</span>
@@ -96,8 +94,8 @@ export function MarkdownToolbar({
   className,
 }: ToolbarProps) {
   return (
-    <div className={cn('flex items-center gap-0.5 border-b p-2', className)}>
-      <div className="flex items-center gap-0.5">
+    <div className={cn('flex items-center gap-0.5 border-b p-2 overflow-x-auto', className)}>
+      <div className="flex items-center gap-0.5 shrink-0">
         <ToolbarButton
           icon={<Bold size={18} />}
           label="Bold"

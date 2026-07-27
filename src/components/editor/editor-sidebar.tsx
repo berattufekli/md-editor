@@ -108,15 +108,13 @@ export function EditorSidebar({
           />
         </div>
         <Tooltip>
-          <TooltipTrigger >
-            <Button
+          <TooltipTrigger render={<Button
               variant="ghost"
               size="sm"
               onClick={onCreateDocument}
               className="h-8 w-8 p-0"
-            >
+            />}>
               <Plus size={18} />
-            </Button>
           </TooltipTrigger>
           <TooltipContent>New Document</TooltipContent>
         </Tooltip>
@@ -174,15 +172,13 @@ export function EditorSidebar({
                       </p>
                     </div>
                     <DropdownMenu>
-                      <DropdownMenuTrigger >
-                        <Button
+                      <DropdownMenuTrigger render={<Button
                           variant="ghost"
                           size="sm"
                           className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
                           onClick={(e) => e.stopPropagation()}
-                        >
+                        />}>
                           <MoreVertical size={14} />
-                        </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => handleStartRename(doc)}>
@@ -213,16 +209,14 @@ export function EditorSidebar({
       <div className="p-2">
         <div className="flex items-center gap-1">
           <Tooltip>
-            <TooltipTrigger >
-              <Button
+            <TooltipTrigger render={<Button
                 variant="ghost"
                 size="sm"
                 className="flex-1 h-8"
                 onClick={onCreateDocument}
-              >
+              />}>
                 <Plus size={16} className="mr-2" />
                 New
-              </Button>
             </TooltipTrigger>
             <TooltipContent>New Document</TooltipContent>
           </Tooltip>
