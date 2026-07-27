@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Visual verification artifacts (regenerable via scripts/snap.mjs)
+docs/screenshots/

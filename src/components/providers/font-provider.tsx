@@ -5,7 +5,6 @@ import {
   useContext,
   useEffect,
   useState,
-  type ReactNode,
 } from 'react';
 import { hydrateSettings } from '@/lib/editor-utils';
 import type { EditorSettings } from '@/types/editor';

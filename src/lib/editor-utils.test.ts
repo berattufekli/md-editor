@@ -47,15 +47,26 @@ describe('wordStats', () => {
       words: 5,
       characters: 28,
       lines: 1,
+      readingMinutes: 1,
     });
   });
 
   it('boş içerikte sıfır istatistikleri döner', () => {
-    expect(wordStats('')).toEqual({ words: 0, characters: 0, lines: 0 });
+    expect(wordStats('')).toEqual({
+      words: 0,
+      characters: 0,
+      lines: 0,
+      readingMinutes: 1,
+    });
   });
 
   it('çok satırlı içerikte doğru satır sayısını verir', () => {
-    expect(wordStats('a\nb\nc')).toEqual({ words: 3, characters: 5, lines: 3 });
+    expect(wordStats('a\nb\nc')).toEqual({
+      words: 3,
+      characters: 5,
+      lines: 3,
+      readingMinutes: 1,
+    });
   });
 });
 

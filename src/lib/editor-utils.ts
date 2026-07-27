@@ -81,15 +81,65 @@ export interface WordStats {
   words: number;
   characters: number;
   lines: number;
+  readingMinutes: number;
 }
 
 export function wordStats(content: string): WordStats {
   const trimmed = content ?? '';
+  const words =
+    trimmed.trim() === '' ? 0 : trimmed.trim().split(/\s+/).length;
   return {
-    words: trimmed.trim() === '' ? 0 : trimmed.trim().split(/\s+/).length,
+    words,
     characters: trimmed.length,
     lines: trimmed === '' ? 0 : trimmed.split('\n').length,
+    readingMinutes: Math.max(1, Math.round(words / 220)),
   };
+}
+
+/**
+ * Returns first non-empty line of a markdown document, used for sidebar
+ * preview. Strips simple heading/list markers and surrounding quotes.
+ */
+export function firstContentLine(content: string, maxLen = 80): string {
+  if (!content) return '';
+  const lines = content.split('\n');
+  for (const raw of lines) {
+    const line = raw.trim();
+    if (!line) continue;
+    if (line.startsWith('#')) continue; // skip titles
+    if (line.startsWith('---') || line.startsWith('```')) continue;
+    const stripped = line
+      .replace(/^[-*+>]\s+/, '')
+      .replace(/^\d+\.\s+/, '')
+      .replace(/^>\s+/, '')
+      .replace(/`/g, '')
+      .trim();
+    if (stripped.length === 0) continue;
+    return stripped.length > maxLen
+      ? `${stripped.slice(0, maxLen - 1).trim()}…`
+      : stripped;
+  }
+  return '';
+}
+
+export function formatSavedAgo(value: Date | string | number): string {
+  const date = new Date(value);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  if (Number.isNaN(diffMs)) return '';
+  const seconds = Math.floor(diffMs / 1000);
+  if (seconds < 5) return 'şu an';
+  if (seconds < 60) return `${seconds} sn önce`;
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes} dk önce`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} sa önce`;
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `${days} gün önce`;
+  return date.toLocaleDateString('tr-TR', {
+    day: 'numeric',
+    month: 'short',
+  });
 }
 
 function createId(): string {
