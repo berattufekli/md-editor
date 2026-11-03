@@ -285,3 +285,33 @@ export function transformSelection(
       return { content, selectionStart: start, selectionEnd: end };
   }
 }
+
+export interface Heading {
+  level: number;
+  text: string;
+  /** 0-based line number in the source. */
+  line: number;
+  /** Character offset of the start of the line. */
+  offset: number;
+}
+
+/** ATX headings (`# Title`) outside fenced code blocks. */
+export function extractHeadings(content: string): Heading[] {
+  const out: Heading[] = [];
+  let fence: string | null = null;
+  let offset = 0;
+  content.split('\n').forEach((raw, line) => {
+    const f = /^\s{0,3}(`{3,}|~{3,})/.exec(raw);
+    if (f) fence = fence === null ? f[1][0] : fence === f[1][0] ? null : fence;
+    else if (fence === null) {
+      const m = /^\s{0,3}(#{1,6})\s+(.+?)\s*#*\s*$/.exec(raw);
+      if (m) out.push({ level: m[1].length, text: m[2], line, offset });
+    }
+    offset += raw.length + 1;
+  });
+  return out;
+}
+
+export function duplicateDocument(doc: Document): Document {
+  return createDocument(`${doc.title} (kopya)`, doc.content);
+}

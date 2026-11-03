@@ -372,6 +372,78 @@
   .workspace {
     grid-template-columns: 1fr;
   }
+
+  /* Phones show one pane at a time; the Yaz / Önizleme tabs choose which. */
+  .stage {
+    grid-template-rows: auto 1fr auto;
+  }
+  .panes[data-split="right"],
+  .panes[data-split="bottom"] {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+  }
+  .panes[data-mobile="write"] > .pane:nth-child(2),
+  .panes[data-mobile="preview"] > .pane:first-child {
+    display: none;
+  }
+  .pane + .pane {
+    border-left: 0;
+  }
+  footer.status-bar {
+    grid-template-columns: 1fr auto;
+    gap: 0.5rem;
+  }
+  .status-bar .status-bar__center {
+    display: none;
+  }
+  .status-bar .status-bar__optional {
+    display: none;
+  }
+}
+
+/* Toast: undo after deleting a document */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 44px;
+  z-index: 60;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  max-width: calc(100vw - 2rem);
+  padding: 0.55rem 0.75rem 0.55rem 1rem;
+  border-radius: 10px;
+  background: var(--ink-primary);
+  color: var(--surface-1);
+  font-size: 0.8125rem;
+  box-shadow: 0 8px 28px rgb(0 0 0 / 0.28);
+  animation: toast-in 180ms ease-out;
+}
+.toast span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.toast__action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+  padding: 0.25rem 0.55rem;
+  border-radius: 6px;
+  font-weight: 600;
+  color: var(--accent-ink, #7fe0cf);
+  background: rgb(255 255 255 / 0.12);
+}
+.toast__action:hover {
+  background: rgb(255 255 255 / 0.2);
+}
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 8px);
+  }
 }
 
 /* ---------------------------------------------------------------------------
@@ -954,6 +1026,30 @@
 .markdown-preview ol {
   padding-left: 1.5em;
   margin: 0 0 1.1em;
+}
+
+.markdown-preview ul {
+  list-style: disc;
+}
+.markdown-preview ol {
+  list-style: decimal;
+}
+.markdown-preview ul ul {
+  list-style: circle;
+}
+
+/* GFM task lists: the checkbox is the marker */
+.markdown-preview ul:has(> li.task-list-item),
+.markdown-preview li.task-list-item {
+  list-style: none;
+}
+.markdown-preview li.task-list-item {
+  margin-left: -1.25em;
+}
+.markdown-preview li.task-list-item input[type="checkbox"] {
+  margin-right: 0.5em;
+  accent-color: var(--accent-brand, #0f766e);
+  vertical-align: -0.1em;
 }
 
 .markdown-preview li {

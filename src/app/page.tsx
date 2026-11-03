@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Plus, FileText, PenLine } from 'lucide-react';
+import { Plus, FileText, PenLine, Undo2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { MarkdownEditor } from '@/components/editor/markdown-editor';
 import { MarkdownPreview } from '@/components/editor/markdown-preview';
@@ -17,6 +17,8 @@ import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcut';
 import {
   createDocument,
   DEFAULT_MARKDOWN,
+  duplicateDocument,
+  type Heading,
   safeFilename,
   transformSelection,
   type MarkdownAction,
@@ -42,7 +44,9 @@ export default function Home() {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [focusMode, setFocusMode] = useState(false);
-  const [mobileView] = useState<'write' | 'preview'>('write');
+  const [mobileView, setMobileView] = useState<'write' | 'preview'>('write');
+  const [undo, setUndo] = useState<{ doc: Document; index: number } | null>(null);
+  const undoTimer = useRef<number | null>(null);
   const [savingState, setSavingState] = useState<'saved' | 'saving' | 'draft'>(
     'saved',
   );
@@ -101,14 +105,58 @@ export default function Home() {
   const remove = useCallback(
     (id: string) => {
       if (documents.length <= 1) return;
+      const index = documents.findIndex((doc) => doc.id === id);
+      if (index < 0) return;
       const next = documents.filter((doc) => doc.id !== id);
       setDocuments(next);
       if (id === active?.id) {
-        setActiveId(next[0]?.id ?? null);
+        setActiveId(next[Math.min(index, next.length - 1)]?.id ?? null);
       }
+      // Deleting is undoable for a few seconds.
+      if (undoTimer.current) window.clearTimeout(undoTimer.current);
+      setUndo({ doc: documents[index], index });
+      undoTimer.current = window.setTimeout(() => setUndo(null), 7000);
     },
     [active?.id, documents, setDocuments],
   );
+
+  const restore = useCallback(() => {
+    if (!undo) return;
+    if (undoTimer.current) window.clearTimeout(undoTimer.current);
+    setDocuments((docs) => {
+      const copy = [...docs];
+      copy.splice(Math.min(undo.index, copy.length), 0, undo.doc);
+      return copy;
+    });
+    setActiveId(undo.doc.id);
+    setUndo(null);
+  }, [setDocuments, undo]);
+
+  const duplicate = useCallback(
+    (id: string) => {
+      const source = documents.find((doc) => doc.id === id);
+      if (!source) return;
+      const copy = duplicateDocument(source);
+      setDocuments((docs) => [...docs, copy]);
+      setActiveId(copy.id);
+      setMobileSidebarOpen(false);
+    },
+    [documents, setDocuments],
+  );
+
+  // Move the caret and both panes to a heading picked from the outline.
+  const jumpToHeading = useCallback((heading: Heading, index: number) => {
+    const area = textareaRef.current ?? document.querySelector<HTMLTextAreaElement>('.markdown-textarea');
+    if (area) {
+      const lh = parseFloat(getComputedStyle(area).lineHeight) || 24;
+      area.scrollTop = Math.max(0, heading.line * lh - 60);
+      area.focus({ preventScroll: true });
+      area.setSelectionRange(heading.offset, heading.offset + heading.text.length + heading.level + 1);
+    }
+    document
+      .querySelectorAll('.markdown-preview :is(h1,h2,h3,h4,h5,h6)')
+      [index]?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+  }, []);
 
   const rename = useCallback(
     (id: string, title: string) => {
@@ -179,9 +227,13 @@ export default function Home() {
   // -------------------------------------------------------------------------
   useKeyboardShortcuts(
     {
-      'mod+b': () => runAction('bold'),
-      'mod+i': () => runAction('italic'),
-      'mod+k': () => runAction('link'),
+      // Formatting shortcuts only act while the editor itself has focus (not in the title or search box).
+      'mod+b': () => document.activeElement === textareaRef.current && runAction('bold'),
+      'mod+i': () => document.activeElement === textareaRef.current && runAction('italic'),
+      // Inside the editor ⌘K adds a link; elsewhere it belongs to the library search.
+      'mod+k': () => {
+        if (document.activeElement === textareaRef.current) runAction('link');
+      },
       'mod+shift+f': () => setFocusMode((f) => !f),
       'mod+\\': () => setSidebarCollapsed((c) => !c),
       'mod+,': () => setSettingsOpen((s) => !s),
@@ -235,22 +287,38 @@ export default function Home() {
             onCreateDocument={create}
             onRenameDocument={rename}
             onDeleteDocument={remove}
+            onDuplicateDocument={duplicate}
             className="ray-desktop"
           />
         )}
 
         <section className="stage">
+          {active && showPreview && (
+            <div className="mobile-tabs" role="tablist" aria-label="Görünüm">
+              {(['write', 'preview'] as const).map((view) => (
+                <button
+                  key={view}
+                  type="button"
+                  role="tab"
+                  aria-selected={mobileView === view}
+                  data-active={mobileView === view}
+                  className="mobile-tabs__btn"
+                  onClick={() => setMobileView(view)}
+                >
+                  {view === 'write' ? 'Yaz' : 'Önizleme'}
+                </button>
+              ))}
+            </div>
+          )}
           {active ? (
             <>
-              <div className="panes" data-split={splitMode}>
+              <div className="panes" data-split={splitMode} data-mobile={mobileView}>
                 <div className="pane">
                   <div className="pane-label">
                     <PenLine aria-hidden className="size-3" />
                     yaz
                   </div>
-                  <div
-                    className={`h-full ${mobileView === 'preview' ? 'mobile-hidden md:block' : ''}`}
-                  >
+                  <div className="h-full">
                     <MarkdownEditor
                       ref={textareaRef}
                       content={active.content}
@@ -262,9 +330,7 @@ export default function Home() {
                 {showPreview && (
                   <div className="pane">
                     <div className="pane-label">öni</div>
-                    <div
-                      className={`h-full ${mobileView === 'write' ? 'mobile-hidden md:block' : ''}`}
-                    >
+                    <div className="h-full">
                       <MarkdownPreview content={active.content} />
                     </div>
                   </div>
@@ -322,6 +388,7 @@ export default function Home() {
               onCreateDocument={create}
               onRenameDocument={rename}
               onDeleteDocument={remove}
+              onDuplicateDocument={duplicate}
             />
           </div>
         </div>
@@ -358,7 +425,18 @@ export default function Home() {
           setSettings({ ...settings, showPreview: !showPreview });
         }}
         savingState={savingState}
+        onJumpToHeading={jumpToHeading}
       />
+
+      {undo && (
+        <div className="toast" role="status" aria-live="polite">
+          <span>“{undo.doc.title || 'Adsız'}” silindi</span>
+          <button type="button" className="toast__action" onClick={restore}>
+            <Undo2 aria-hidden className="size-3.5" />
+            Geri al
+          </button>
+        </div>
+      )}
     </main>
   );
 }

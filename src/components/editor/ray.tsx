@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { FileText, FolderOpen, MoreHorizontal, Pencil, Trash2, Plus } from 'lucide-react';
+import { Copy, FileText, FolderOpen, MoreHorizontal, Pencil, Trash2, Plus } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,6 +27,7 @@ interface RayProps {
   onCreateDocument: () => void;
   onRenameDocument: (id: string, title: string) => void;
   onDeleteDocument: (id: string) => void;
+  onDuplicateDocument: (id: string) => void;
   className?: string;
 }
 
@@ -37,6 +38,7 @@ export function Ray({
   onCreateDocument,
   onRenameDocument,
   onDeleteDocument,
+  onDuplicateDocument,
   className,
 }: RayProps) {
   const [search, setSearch] = useState('');
@@ -47,7 +49,8 @@ export function Ray({
   // Cmd/Ctrl+K focuses the search
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+      const inEditor = (e.target as HTMLElement | null)?.classList?.contains('markdown-textarea');
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k' && !inEditor) {
         e.preventDefault();
         searchRef.current?.focus();
       }
@@ -215,6 +218,10 @@ export function Ray({
                           <DropdownMenuItem onClick={() => beginRename(doc)}>
                             <Pencil className="size-3.5" />
                             Yeniden adlandır
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => onDuplicateDocument(doc.id)}>
+                            <Copy className="size-3.5" />
+                            Çoğalt
                           </DropdownMenuItem>
                           {documents.length > 1 && (
                             <DropdownMenuItem

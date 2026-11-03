@@ -82,6 +82,7 @@ function Slider({
         max={max}
         step={step}
         value={value}
+        aria-label={label}
         onChange={(e) => onChange(parseFloat(e.target.value))}
         className="w-full appearance-none bg-transparent
           [&::-webkit-slider-runnable-track]:h-px
@@ -131,6 +132,7 @@ function Switch({
         type="button"
         role="switch"
         aria-checked={checked}
+        aria-label={label}
         className="switch"
         data-checked={checked}
         onClick={() => onCheckedChange(!checked)}

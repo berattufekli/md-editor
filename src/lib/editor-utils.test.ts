@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
   createDocument,
+  duplicateDocument,
+  extractHeadings,
   DEFAULT_DOCUMENT_TITLE,
   DEFAULT_MARKDOWN,
   filterDocuments,
@@ -172,5 +174,32 @@ describe('default constants', () => {
     expect(DEFAULT_DOCUMENT_TITLE).toBe('Welcome');
     expect(DEFAULT_MARKDOWN).toContain(DEFAULT_DOCUMENT_TITLE);
     expect(DEFAULT_MARKDOWN).toContain('-');
+  });
+});
+
+describe('extractHeadings', () => {
+  it('lists headings with level, text and position', () => {
+    const md = '# Bir\n\ntext\n\n## İki ##\n### Üç';
+    expect(extractHeadings(md)).toEqual([
+      { level: 1, text: 'Bir', line: 0, offset: 0 },
+      { level: 2, text: 'İki', line: 4, offset: 13 },
+      { level: 3, text: 'Üç', line: 5, offset: 23 },
+    ]);
+  });
+  it('ignores hashes inside fenced code and non-headings', () => {
+    const md = '```sh\n# comment\n```\n#hashtag\n####### seven\n# Real';
+    expect(extractHeadings(md).map((h) => h.text)).toEqual(['Real']);
+  });
+  it('returns nothing for empty content', () => {
+    expect(extractHeadings('')).toEqual([]);
+  });
+});
+
+describe('duplicateDocument', () => {
+  it('copies content under a new id and title', () => {
+    const copy = duplicateDocument(baseDoc({ title: 'Not', content: 'a' }));
+    expect(copy.title).toBe('Not (kopya)');
+    expect(copy.content).toBe('a');
+    expect(copy.id).not.toBe('doc-1');
   });
 });

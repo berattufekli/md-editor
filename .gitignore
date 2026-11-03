@@ -42,3 +42,7 @@ next-env.d.ts
 
 # Visual verification artifacts (regenerable via scripts/snap.mjs)
 docs/screenshots/
+
+# e2e
+/test-results/
+/playwright-report/
